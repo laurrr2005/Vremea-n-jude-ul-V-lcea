@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Story Meteo Vâlcea - 7 Noiembrie 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b1120;
+            touch-action: manipulation;
+        }
+        @keyframes floatCloud {
+            0% { transform: translateX(-20px); opacity: 0.7; }
+            50% { transform: translateX(20px); opacity: 0.9; }
+            100% { transform: translateX(-20px); opacity: 0.7; }
+        }
+        .animate-cloud { animation: floatCloud 8s ease-in-out infinite; }
+        @keyframes sunGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.7)); }
+        }
+        .animate-sun { animation: sunGlow 4s ease-in-out infinite; }
+        @keyframes frostSparkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.95); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-frost { animation: frostSparkle 3s ease-in-out infinite; }
+        
+        /* Glassmorphism card styles */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        /* Hide scrollbars */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 md:p-4 text-white overflow-hidden select-none">
+
+    <!-- Mobile Story Container (9:16 aspect ratio on desktop, full screen on mobile) -->
+    <div id="storyContainer" class="relative w-full h-[100vh] md:h-[844px] md:w-[390px] md:rounded-[40px] md:shadow-2xl md:border-4 md:border-slate-800 overflow-hidden flex flex-col justify-between bg-gradient-to-b from-sky-950 via-slate-900 to-indigo-950 transition-all">
+
+        <!-- Background Atmospheric Animated Gradient Elements -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+            <div class="absolute -top-24 -left-24 w-72 h-72 bg-sky-500/20 rounded-full blur-3xl animate-cloud"></div>
+            <div class="absolute top-1/3 -right-20 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl animate-cloud" style="animation-delay: 3s;"></div>
+            <div class="absolute -bottom-20 left-10 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl animate-frost"></div>
+        </div>
+
+        <!-- Top Header & Progress Bars -->
+        <div class="relative z-30 pt-4 px-4 flex flex-col gap-3">
+            <!-- Progress Bars -->
+            <div class="grid grid-cols-5 gap-1.5 w-full">
+                <div class="h-1 bg-white/20 rounded-full overflow-hidden">
+                    <div id="prog-0" class="h-full bg-white w-0 transition-all duration-100"></div>
+                </div>
+                <div class="h-1 bg-white/20 rounded-full overflow-hidden">
+                    <div id="prog-1" class="h-full bg-white w-0 transition-all duration-100"></div>
+                </div>
+                <div class="h-1 bg-white/20 rounded-full overflow-hidden">
+                    <div id="prog-2" class="h-full bg-white w-0 transition-all duration-100"></div>
+                </div>
+                <div class="h-1 bg-white/20 rounded-full overflow-hidden">
+                    <div id="prog-3" class="h-full bg-white w-0 transition-all duration-100"></div>
+                </div>
+                <div class="h-1 bg-white/20 rounded-full overflow-hidden">
+                    <div id="prog-4" class="h-full bg-white w-0 transition-all duration-100"></div>
+                </div>
+            </div>
+
+            <!-- Story Header Controls -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-500 flex items-center justify-center shadow-md font-bold text-xs text-white border border-white/30">
+                        VÂ
+                    </div>
+                    <div>
+                        <h2 class="text-xs font-bold tracking-wide text-slate-200 uppercase">Meteo Vâlcea</h2>
+                        <p class="text-[10px] text-sky-300 font-medium">7 Noiembrie 2026</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="togglePause()" id="pauseBtn" class="p-2 rounded-full glass-pill text-white/80 hover:text-white transition cursor-pointer" title="Pauză / Play">
+                        <i data-lucide="pause" id="pauseIcon" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="restartStory()" class="p-2 rounded-full glass-pill text-white/80 hover:text-white transition cursor-pointer" title="Reia">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Slides Area (Interactive Touch & Click zones) -->
+        <div class="relative z-20 flex-1 flex flex-col justify-center px-5 py-4 overflow-hidden" onclick="handleScreenClick(event)">
+            
+            <!-- Left/Right Click Nav Zones indicator overlay -->
+            <div class="absolute inset-y-0 left-0 w-1/4 z-30 cursor-pointer" onclick="prevSlide(event)" title="Slide Anterior"></div>
+            <div class="absolute inset-y-0 right-0 w-1/4 z-30 cursor-pointer" onclick="nextSlide(event)" title="Slide Următor"></div>
+
+            <!-- SLIDE 1: Râmnicu Vâlcea (Reședința de județ) -->
+            <div id="slide-0" class="story-slide absolute inset-x-5 inset-y-16 flex flex-col justify-between opacity-0 pointer-events-none transition-all duration-500 transform translate-y-4">
+                <div class="flex flex-col items-center text-center mt-2">
+                    <span class="text-[11px] uppercase tracking-widest px-3 py-1 rounded-full glass-pill text-sky-300 font-semibold mb-3 border border-sky-400/30">
+                        Reședință de Județ
+                    </span>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-white mb-1">Râmnicu Vâlcea</h1>
+                    <p class="text-xs text-slate-300 flex items-center gap-1">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-sky-400"></i> Sâmbătă, 7 Noiembrie 2026
+                    </p>
+                </div>
+
+                <!-- Central Weather Graphic & Temp Card -->
+                <div class="glass-card rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center my-auto">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl"></div>
+                    
+                    <!-- Animated Weather Icon -->
+                    <div class="relative my-3 animate-sun">
+                        <div class="p-4 bg-gradient-to-tr from-sky-500/30 to-amber-500/30 rounded-3xl border border-white/20 shadow-xl flex items-center justify-center text-amber-300">
+                            <i data-lucide="cloud-sun" class="w-16 h-16"></i>
+                        </div>
+                    </div>
+
+                    <div class="text-5xl font-black tracking-tighter text-white mb-2 flex items-start">
+                        10<span class="text-2xl font-bold text-sky-400 ml-0.5">°C</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 w-full mt-3">
+                        <div class="bg-slate-900/60 p-3 rounded-2xl border border-white/10 text-center">
+                            <span class="text-[10px] text-slate-400 block uppercase font-medium">Minimă</span>
+                            <span class="text-lg font-bold text-sky-300">-1°C</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-2xl border border-white/10 text-center">
+                            <span class="text-[10px] text-slate-400 block uppercase font-medium">Maximă</span>
+                            <span class="text-lg font-bold text-amber-300">10°C</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Details Card -->
+                <div class="glass-card rounded-2xl p-4 flex flex-col gap-2.5 shadow-lg">
+                    <div class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+                        Cer parțial însorit, toamnă târzie
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 pt-2 border-t border-white/10">
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="wind" class="w-3.5 h-3.5 text-sky-400"></i> Vânt: 4 mph (Sud)
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="snowflake" class="w-3.5 h-3.5 text-indigo-300"></i> Brumă matinală
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: Drăgășani & Bălcești (Sudul Județului) -->
+            <div id="slide-1" class="story-slide absolute inset-x-5 inset-y-16 flex flex-col justify-between opacity-0 pointer-events-none transition-all duration-500 transform translate-y-4">
+                <div class="flex flex-col items-center text-center mt-2">
+                    <span class="text-[11px] uppercase tracking-widest px-3 py-1 rounded-full glass-pill text-amber-300 font-semibold mb-3 border border-amber-400/30">
+                        Sudul Județului & Podișul Oltețului
+                    </span>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">Drăgășani & Bălcești</h1>
+                    <p class="text-xs text-slate-300">Regiunea viticolă și podiș</p>
+                </div>
+
+                <!-- Two Town Cards -->
+                <div class="flex flex-col gap-3.5 my-auto">
+                    <!-- Drăgășani -->
+                    <div class="glass-card rounded-2xl p-4 shadow-xl border-l-4 border-amber-400 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 bg-amber-500/20 text-amber-300 rounded-xl">
+                                <i data-lucide="sun" class="w-6 h-6 animate-sun"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base text-white">Drăgășani</h3>
+                                <p class="text-xs text-slate-300">Parțial însorit ziua, senin noaptea</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-white">10°C</div>
+                            <div class="text-xs text-sky-400 font-semibold">Min: -1°C</div>
+                        </div>
+                    </div>
+
+                    <!-- Bălcești -->
+                    <div class="glass-card rounded-2xl p-4 shadow-xl border-l-4 border-sky-400 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 bg-sky-500/20 text-sky-300 rounded-xl">
+                                <i data-lucide="cloud-sun" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base text-white">Bălcești</h3>
+                                <p class="text-xs text-slate-300">Relativ însorit, loc. Nicolae Bălcescu</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-white">11°C</div>
+                            <div class="text-xs text-sky-400 font-semibold">Min: -1°C</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Summary Note -->
+                <div class="glass-card rounded-2xl p-3.5 text-center text-xs text-slate-300">
+                    <span class="text-amber-300 font-semibold">Notă meteo:</span> Condiții excelente pentru podgorii, vânt slab din sud (4 mph).
+                </div>
+            </div>
+
+            <!-- SLIDE 3: Călimănești, Băile Olănești, Brezoi, Horezu (Zona Montană) -->
+            <div id="slide-2" class="story-slide absolute inset-x-5 inset-y-16 flex flex-col justify-between opacity-0 pointer-events-none transition-all duration-500 transform translate-y-4">
+                <div class="flex flex-col items-center text-center mt-2">
+                    <span class="text-[11px] uppercase tracking-widest px-3 py-1 rounded-full glass-pill text-indigo-300 font-semibold mb-3 border border-indigo-400/30">
+                        Zona Montană & Stațiuni
+                    </span>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">Nordul & Stațiunile</h1>
+                    <p class="text-xs text-slate-300">Vreme mai rece la poalele munților</p>
+                </div>
+
+                <!-- 4 Mountain Cards Grid -->
+                <div class="grid grid-cols-2 gap-2.5 my-auto">
+                    <!-- Călimănești -->
+                    <div class="glass-card rounded-2xl p-3 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-1">
+                            <i data-lucide="cloud-sun" class="w-5 h-5 text-sky-400"></i>
+                            <span class="text-sm font-bold text-white">11°C</span>
+                        </div>
+                        <h4 class="font-semibold text-xs text-white">Călimănești</h4>
+                        <span class="text-[10px] text-sky-300 font-medium">Min: -1°C</span>
+                    </div>
+
+                    <!-- Băile Olănești -->
+                    <div class="glass-card rounded-2xl p-3 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-1">
+                            <i data-lucide="cloud" class="w-5 h-5 text-indigo-300"></i>
+                            <span class="text-sm font-bold text-white">10°C</span>
+                        </div>
+                        <h4 class="font-semibold text-xs text-white">Băile Olănești</h4>
+                        <span class="text-[10px] text-sky-300 font-medium">Min: -2°C</span>
+                    </div>
+
+                    <!-- Brezoi -->
+                    <div class="glass-card rounded-2xl p-3 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-1">
+                            <i data-lucide="mountain" class="w-5 h-5 text-indigo-400"></i>
+                            <span class="text-sm font-bold text-white">9°C</span>
+                        </div>
+                        <h4 class="font-semibold text-xs text-white">Brezoi</h4>
+                        <span class="text-[10px] text-sky-300 font-medium">Min: -3°C</span>
+                    </div>
+
+                    <!-- Horezu -->
+                    <div class="glass-card rounded-2xl p-3 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-1">
+                            <i data-lucide="cloud-fog" class="w-5 h-5 text-sky-300"></i>
+                            <span class="text-sm font-bold text-white">9°C</span>
+                        </div>
+                        <h4 class="font-semibold text-xs text-white">Horezu</h4>
+                        <span class="text-[10px] text-sky-300 font-medium">Min: -2°C</span>
+                    </div>
+                </div>
+
+                <!-- Footer tip -->
+                <div class="glass-card rounded-2xl p-3 text-center text-[11px] text-slate-300">
+                    <span class="text-indigo-300 font-semibold">Atenție:</span> Temperaturi sub zero noaptea în depresiuni montane.
+                </div>
+            </div>
+
+            <!-- SLIDE 4: Băbeni, Băile Govora, Ocnele Mari, Berbești (Restul Localităților) -->
+            <div id="slide-3" class="story-slide absolute inset-x-5 inset-y-16 flex flex-col justify-between opacity-0 pointer-events-none transition-all duration-500 transform translate-y-4">
+                <div class="flex flex-col items-center text-center mt-2">
+                    <span class="text-[11px] uppercase tracking-widest px-3 py-1 rounded-full glass-pill text-emerald-300 font-semibold mb-3 border border-emerald-400/30">
+                        Restul Localităților
+                    </span>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">Băbeni, Govora & Altele</h1>
+                    <p class="text-xs text-slate-300">Minime și maxime pentru 7 noiembrie</p>
+                </div>
+
+                <!-- List of 4 towns -->
+                <div class="flex flex-col gap-2.5 my-auto">
+                    <!-- Băbeni -->
+                    <div class="glass-card rounded-xl p-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                            <span class="font-semibold text-sm text-white">Băbeni</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-200">11°C / <span class="text-sky-400">-1°C</span></div>
+                    </div>
+
+                    <!-- Ocnele Mari -->
+                    <div class="glass-card rounded-xl p-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                            <span class="font-semibold text-sm text-white">Ocnele Mari</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-200">10°C / <span class="text-sky-400">-1°C</span></div>
+                    </div>
+
+                    <!-- Băile Govora -->
+                    <div class="glass-card rounded-xl p-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2 h-2 rounded-full bg-sky-400"></div>
+                            <span class="font-semibold text-sm text-white">Băile Govora</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-200">10°C / <span class="text-sky-400">-2°C</span></div>
+                    </div>
+
+                    <!-- Berbești -->
+                    <div class="glass-card rounded-xl p-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2 h-2 rounded-full bg-indigo-400"></div>
+                            <span class="font-semibold text-sm text-white">Berbești</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-200">10°C / <span class="text-sky-400">-2°C</span></div>
+                    </div>
+                </div>
+
+                <!-- Footer info -->
+                <div class="glass-card rounded-2xl p-3 text-center text-[11px] text-slate-300">
+                    Vreme stabilă în toate bazinele economice și balneare.
+                </div>
+            </div>
+
+            <!-- SLIDE 5: Recomandare / Sfat Meteo -->
+            <div id="slide-4" class="story-slide absolute inset-x-5 inset-y-16 flex flex-col justify-between opacity-0 pointer-events-none transition-all duration-500 transform translate-y-4">
+                <div class="flex flex-col items-center text-center mt-4">
+                    <span class="text-[11px] uppercase tracking-widest px-3 py-1 rounded-full glass-pill text-rose-300 font-semibold mb-3 border border-rose-400/30 animate-pulse">
+                        Recomandare Oficială
+                    </span>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">Sfat Meteo 7 Noiembrie</h1>
+                </div>
+
+                <!-- Recommendation center card -->
+                <div class="glass-card rounded-3xl p-6 shadow-2xl flex flex-col gap-4 my-auto border border-rose-500/20">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3.5 bg-rose-500/20 text-rose-300 rounded-2xl">
+                            <i data-lucide="shield-alert" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Pregătire de Toamnă Târzie</h3>
+                            <p class="text-xs text-slate-300">Temperaturi scăzute și brumă</p>
+                        </div>
+                    </div>
+
+                    <ul class="space-y-2.5 text-xs text-slate-200 border-t border-white/10 pt-3">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                            <span>Atenție la brumă și polei matinal în zonele depresionare și montane.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                            <span>Minime nocturne negative (-1°C până la -3°C). Protejați culturile sensibile.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                            <span>Echipament corespunzător de toamnă (haine groase, jachete vânt).</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Final signoff -->
+                <div class="text-center pb-2">
+                    <p class="text-xs text-sky-300 font-semibold">O zi frumoasă în județul Vâlcea! 🍂</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation Controls & Tap Hints -->
+        <div class="relative z-30 pb-4 px-5 flex items-center justify-between text-xs text-slate-400">
+            <button onclick="prevSlide(event)" class="px-3 py-1.5 rounded-xl glass-pill hover:bg-white/20 text-white transition flex items-center gap-1 cursor-pointer">
+                <i data-lucide="chevron-left" class="w-4 h-4"><span>Anterior</span></i>
+            </button>
+            <span id="slideIndicator" class="font-semibold text-slate-200">1 / 5</span>
+            <button onclick="nextSlide(event)" class="px-3 py-1.5 rounded-xl glass-pill hover:bg-white/20 text-white transition flex items-center gap-1 cursor-pointer">
+                <span>Următor</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Story Logic & Auto-play Timer -->
+    <script>
+        const totalSlides = 5;
+        let currentSlide = 0;
+        let slideDuration = 6000; // 6 seconds per slide
+        let timer = null;
+        let progressInterval = null;
+        let progressStart = 0;
+        let isPaused = false;
+
+        function showSlide(index) {
+            // Hide all slides
+            document.querySelectorAll('.story-slide').forEach((slide, idx) => {
+                slide.classList.remove('opacity-100', 'translate-y-0');
+                slide.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            });
+
+            // Reset all progress bars
+            for (let i = 0; i < totalSlides; i++) {
+                const bar = document.getElementById('prog-' + i);
+                if (i < index) bar.style.width = '100%';
+                else if (i > index) bar.style.width = '0%';
+            }
+
+            // Show target slide
+            const target = document.getElementById('slide-' + index);
+            if (target) {
+                target.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                target.classList.add('opacity-100', 'translate-y-0');
+            }
+
+            document.getElementById('slideIndicator').innerText = (index + 1) + ' / ' + totalSlides;
+            currentSlide = index;
+            progressStart = Date.now();
+        }
+
+        function nextSlide(e) {
+            if (e) e.stopPropagation();
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            } else {
+                showSlide(0); // Loop back
+            }
+            resetTimer();
+        }
+
+        function prevSlide(e) {
+            if (e) e.stopPropagation();
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            } else {
+                showSlide(totalSlides - 1);
+            }
+            resetTimer();
+        }
+
+        function handleScreenClick(e) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            if (x < rect.width / 2) {
+                prevSlide();
+            } else {
+                nextSlide();
+            }
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const icon = document.getElementById('pauseIcon');
+            if (isPaused) {
+                icon.setAttribute('data-lucide', 'play');
+                clearInterval(timer);
+                clearInterval(progressInterval);
+            } else {
+                icon.setAttribute('data-lucide', 'pause');
+                startTimer();
+            }
+            lucide.createIcons();
+        }
+
+        function restartStory() {
+            isPaused = false;
+            document.getElementById('pauseIcon').setAttribute('data-lucide', 'pause');
+            showSlide(0);
+            resetTimer();
+            lucide.createIcons();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            clearInterval(progressInterval);
+
+            progressStart = Date.now();
+            progressInterval = setInterval(() => {
+                if (isPaused) return;
+                let elapsed = Date.now() - progressStart;
+                let pct = Math.min(100, (elapsed / slideDuration) * 100);
+                document.getElementById('prog-' + currentSlide).style.width = pct + '%';
+            }, 50);
+
+            timer = setTimeout(() => {
+                if (!isPaused) {
+                    if (currentSlide < totalSlides - 1) {
+                        showSlide(currentSlide + 1);
+                        startTimer();
+                    } else {
+                        showSlide(0);
+                        startTimer();
+                    }
+                }
+            }, slideDuration);
+        }
+
+        function resetTimer() {
+            if (!isPaused) {
+                startTimer();
+            }
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            lucide.createIcons();
+            showSlide(0);
+            startTimer();
+        };
+    </script>
+</body>
+</html>
